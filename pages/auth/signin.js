@@ -12,12 +12,13 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isloading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
     try {
       const res = await signIn("credentials", {
         email,
@@ -27,27 +28,28 @@ const SignInPage = () => {
 
       if (res.error) {
         setError("Invalid Username or password");
+        setIsLoading(false);
         return;
       }
 
       router.replace("/chat");
     } catch (error) {
+      setIsLoading(false);
+      setError(error);
       console.log(error);
     }
   };
   return (
     <Layout>
+      <p className="text-lg text-slate-300">
+        Log in with your account to continue
+      </p>
       <div className="bg-white md:py-6 py-6 md:px-8 px-3 rounded-md">
-        <div className=" text-4xl">🔒</div>
-        <h1 className="md:text-4xl text-3xl font-medium">Next-Auth Login</h1>
-        <p className="my-4 text-lg text-slate-500">
-          Log in with your account to continue
-        </p>
-        <div className="p-5 rounded-lg border-2 border-dashed ">
+        <div className="p-4 rounded-lg border-2 border-dashed ">
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <input
               onChange={(e) => setEmail(e.target.value)}
-              type="text"
+              type="email"
               placeholder="Email"
               className=" w-72 bg-stone-100 px-4 py-2 rounded-lg"
             />
@@ -66,8 +68,21 @@ const SignInPage = () => {
               />
             </div>
 
-            <button className="bg-blue-500 rounded-md text-white font-bold cursor-pointer px-6 py-2">
-              Login
+            <button
+              className={`bg-blue-500 rounded-md flex justify-center text-white font-bold cursor-pointer px-6 py-2 ${
+                isloading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isloading}
+            >
+              {isloading ? (
+                <img
+                  src="/Dual Ring-1s-200px.svg"
+                  className="h-8"
+                  alt="Italian Trulli"
+                ></img>
+              ) : (
+                <p>Login</p>
+              )}
             </button>
             {error && (
               <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
